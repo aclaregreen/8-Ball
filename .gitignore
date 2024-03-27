@@ -1,0 +1,9 @@
+*.svg
+*.o
+*.so
+__pycache__/
+display.html
+phylib_wrap.c
+phylib.py
+*.svg
+*.db
