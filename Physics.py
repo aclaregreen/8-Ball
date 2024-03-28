@@ -44,13 +44,20 @@ BALL_COLOURS = [
     "GREEN",
     "BROWN",
     "BLACK",
-    "LIGHTYELLOW",
-    "LIGHTBLUE",
-    "PINK",             # no LIGHTRED
-    "MEDIUMPURPLE",     # no LIGHTPURPLE
-    "LIGHTSALMON",      # no LIGHTORANGE
-    "LIGHTGREEN",
-    "SANDYBROWN",       # no LIGHTBROWN 
+    "YELLOW",
+    "BLUE",
+    "RED",
+    "PURPLE",
+    "ORANGE",
+    "GREEN",
+    "BROWN"
+    # "LIGHTYELLOW",
+    # "LIGHTBLUE",
+    # "PINK",             # no LIGHTRED
+    # "MEDIUMPURPLE",     # no LIGHTPURPLE
+    # "LIGHTSALMON",      # no LIGHTORANGE
+    # "LIGHTGREEN",
+    # "SANDYBROWN",       # no LIGHTBROWN 
     ];
 
 ################################################################################
@@ -87,7 +94,10 @@ class StillBall( phylib.phylib_object ):
 
     # add an svg method here
     def svg(self):
-        string = """ <circle cx="%d" cy="%d" r="%d" fill="%s" />\n""" % (self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number])
+        string = """ <circle cx="%d" cy="%d" r="%.1lf" fill="%s" />\n""" % (self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.still_ball.number])
+        if (self.obj.still_ball.number > 8):
+            string += """<circle cx="%d" cy="%d" r="%.1lf" fill="%s" />\n""" % (self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS - 10, "GHOSTWHITE")
+            string += """<circle cx="%d" cy="%d" r="%.1lf" fill="%s" />\n""" % (self.obj.still_ball.pos.x, self.obj.still_ball.pos.y, BALL_RADIUS - 20, BALL_COLOURS[self.obj.still_ball.number])
         return string
 
 ################################################################################
@@ -113,7 +123,10 @@ class RollingBall( phylib.phylib_object ):
         self.__class__ = RollingBall;
 
     def svg(self):
-        string =  """ <circle cx="%d" cy="%d" r="%d" fill="%s" />\n""" % (self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number])
+        string =  """ <circle cx="%d" cy="%d" r="%lf" fill="%s" />\n""" % (self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS, BALL_COLOURS[self.obj.rolling_ball.number])
+        if (self.obj.rolling_ball.number > 8):
+            string += """<circle cx="%d" cy="%d" r="%lf" fill="%s" />\n""" % (self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS - 10, "GHOSTWHITE")
+            string += """<circle cx="%d" cy="%d" r="%lf" fill="%s" />\n""" % (self.obj.rolling_ball.pos.x, self.obj.rolling_ball.pos.y, BALL_RADIUS - 20, BALL_COLOURS[self.obj.rolling_ball.number])
         return string
 ##################################################################################
 class Hole( phylib.phylib_object ):
@@ -543,25 +556,25 @@ class Database:
         sb = StillBall( 1, pos );
         table += sb;
 
-        # 2 ball
+        # 5 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0,
                         TABLE_WIDTH/2.0 - 
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
-        sb = StillBall( 2, pos );
+        sb = StillBall( 5, pos );
         table += sb;
 
-        # 3 ball
+        # 11 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0,
                         TABLE_WIDTH/2.0 - 
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
-        sb = StillBall( 3, pos );
+        sb = StillBall( 11, pos );
         table += sb;
 
-        #4 ball
+        #10 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0 -
                         (BALL_DIAMETER+4.0)/2.0,
@@ -570,10 +583,10 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 4, pos );
+        sb = StillBall( 10, pos );
         table += sb;
 
-        #5 ball
+        #8 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0,
                         TABLE_WIDTH/2.0 - 
@@ -581,10 +594,10 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 5, pos );
+        sb = StillBall( 8, pos );
         table += sb;
 
-        #6 ball
+        #2 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0 +
                         (BALL_DIAMETER+4.0)/2.0,
@@ -593,10 +606,10 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 6, pos );
+        sb = StillBall( 2, pos );
         table += sb;
 
-        #7 ball
+        #4 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0 -
                         (BALL_DIAMETER+4.0)/2.0 - (BALL_DIAMETER+4.0)/2.0,
@@ -606,10 +619,10 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 7, pos );
+        sb = StillBall( 4, pos );
         table += sb;
 
-        #8 ball
+        #14 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0,
                         TABLE_WIDTH/2.0 - 
@@ -618,9 +631,9 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 8, pos );
+        sb = StillBall( 14, pos );
         table += sb;
-        #9 ball
+        #7 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0,
                         TABLE_WIDTH/2.0 - 
@@ -629,9 +642,9 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 9, pos );
+        sb = StillBall( 7, pos );
         table += sb;
-        #10 ball
+        #9 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0 +
                         (BALL_DIAMETER+4.0)/2.0 + (BALL_DIAMETER+4.0)/2.0,
@@ -641,9 +654,9 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 10, pos );
+        sb = StillBall( 9, pos );
         table += sb;
-        #11 ball
+        #12 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0 -
                         (BALL_DIAMETER+4.0)/2.0 - (BALL_DIAMETER+4.0)/2.0 -
@@ -655,9 +668,9 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 11, pos );
+        sb = StillBall( 12, pos );
         table += sb;
-        #12 ball
+        #3 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0 -
                         (BALL_DIAMETER+4.0)/2.0,
@@ -668,7 +681,7 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 12, pos );
+        sb = StillBall( 3, pos );
         table += sb;
         #13 ball
         pos = Coordinate(
@@ -682,7 +695,7 @@ class Database:
         
         sb = StillBall( 13, pos );
         table += sb;
-        #14 ball
+        #15 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0 +
                         (BALL_DIAMETER+4.0)/2.0,
@@ -693,9 +706,9 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 14, pos );
+        sb = StillBall( 15, pos );
         table += sb;
-        #15 ball
+        #6 ball
         pos = Coordinate(
                         TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0 +
                         (BALL_DIAMETER+4.0)/2.0 + (BALL_DIAMETER+4.0)/2.0 +
@@ -707,7 +720,7 @@ class Database:
                         math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
                         );
         
-        sb = StillBall( 15, pos );
+        sb = StillBall( 6, pos );
         table += sb;
         # cue ball also still
         pos = Coordinate( TABLE_WIDTH/2.0,
@@ -733,6 +746,9 @@ class Game:
             game, self.tableID = self.database.getGame(gameID + 1)
             self.player1Name, self.gameName = game[0]
             self.player2Name = game[1][0]
+            f = open("table.svg", "w")
+            f.write(self.database.readTable(self.tableID).svg())
+            f.close()
             
         elif (gameID is None and gameName is not None and player1Name is not None and player2Name is not None):
             self.gameName = gameName
@@ -743,6 +759,7 @@ class Game:
             self.gameID = self.database.setGame(gameName, player1Name, player2Name, self.tableID)
         else:
             raise TypeError("Invlaid arguments")
+        
     def shoot(self, gameName, playerName, table, xvel, yvel):
         #work here
         #shot_id = self.database.newShot(playerName, self.gameID)

@@ -4,6 +4,7 @@ import sys; # used to get argv
 import Physics
 import math
 import os
+import random
 
 # web server parts
 from http.server import HTTPServer, BaseHTTPRequestHandler;
@@ -87,6 +88,19 @@ class MyHandler( BaseHTTPRequestHandler ):
 
             game = Physics.Game(gameId, gameName, player1, player2)
             id = game.gameID
+            player1 = game.player1Name
+            player2 = game.player2Name
+            gameName = game.gameName
+            randInt = random.randint(1, 2)
+            if (randInt == 1):
+                playerTurn = player1
+                hidden = player2
+            else:
+                playerTurn = player2
+                hidden = player1
+            playerTurn += "'s turn"
+            hidden += "'s turn"
+            ballType = ""
 
             for filename in os.listdir("."):
                 if filename.startswith("table-") and filename.endswith(".svg"):
@@ -107,27 +121,16 @@ class MyHandler( BaseHTTPRequestHandler ):
                 fptr.write("</head>\n")
                 fptr.write("<body>\n")
                 fptr.write("<h1>8 Ball</h1>\n")
+                fptr.write("<span id='playerTurn'>{}</span>\n".format(playerTurn))
+                fptr.write("<span id='ballType'>{}</span>\n".format(ballType))
+                fptr.write("<span id='hidden' style='display: none;'>{}</span>\n".format(hidden))
                 #fptr.write("<p> Game Id: </p>" + "<p id='variable_id'>{}</p>".format(id))
                 fptr.write("<span>Game Id: </span>" + "<span id='variable_id'>{}</span><br>\n".format(id))
-                #fptr.write("<p id='variable_id'>{}</p>\n".format(id))
                 fptr.write("<a href='shoot.html'>BACK</a>\n")
                 fptr.write("<div id='content'>")
-                # fptr.write("</div>")
-                # fptr.write("<p id='variable_id'>Game ID: {}</p>\n".format(id))
-                # fptr.write("<a href='shoot.html'>BACK</a>\n")
-                #fptr.write("<svg id='svgContainer' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>\n")
-                #fptr.write("<svg id='svgContainer' width='700' height='1375' viewBox='-25 -25 1400 2750' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'>\n")
-                # Include the content of table.svg directly here
                 fptr.write(svg_content)
-
                 fptr.write("</svg>\n")
-
                 fptr.write("</div>")
-                # Include other HTML content
-                #fptr.write("<h1>8 Ball</h1>\n")
-                
-                
-                
                 # Include JavaScript code
                 fptr.write("<script>\n")
                 with open("game.js", "r") as js_file:
@@ -162,6 +165,9 @@ class MyHandler( BaseHTTPRequestHandler ):
 
             game = Physics.Game(id)
             table = game.database.readTable(game.tableID)
+
+            # Process the playerTurn value as needed
+            
             files = game.shoot(game.gameName, game.player1Name, table, velx, vely)
             for i in range(len(files)):
                 string = files[i].svg()

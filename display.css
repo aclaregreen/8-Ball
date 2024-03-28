@@ -2,4 +2,19 @@ svg {
     max-width: 500px;
     max-height: 500px;
   }
-  
+
+#playerTurn {
+    position: fixed;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 36px;
+}
+
+#ballType {
+  position: fixed;
+  top: 90px; /* Adjusted to add 40px space below playerTurn */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36px;
+}
