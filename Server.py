@@ -98,8 +98,7 @@ class MyHandler( BaseHTTPRequestHandler ):
             else:
                 playerTurn = player2
                 hidden = player1
-            playerTurn += "'s turn"
-            hidden += "'s turn"
+            winner = ""
             ballType = ""
 
             for filename in os.listdir("."):
@@ -123,10 +122,10 @@ class MyHandler( BaseHTTPRequestHandler ):
                 fptr.write("<h1>8 Ball</h1>\n")
                 fptr.write("<span id='playerTurn'>{}</span>\n".format(playerTurn))
                 fptr.write("<span id='ballType'>{}</span>\n".format(ballType))
+                fptr.write("<span id='winner'>{}</span>\n".format(winner))
                 fptr.write("<span id='hidden' style='display: none;'>{}</span>\n".format(hidden))
-                #fptr.write("<p> Game Id: </p>" + "<p id='variable_id'>{}</p>".format(id))
                 fptr.write("<span>Game Id: </span>" + "<span id='variable_id'>{}</span><br>\n".format(id))
-                fptr.write("<a href='shoot.html'>BACK</a>\n")
+                fptr.write("<a href='shoot.html' id='backButton'>BACK</a>\n")
                 fptr.write("<div id='content'>")
                 fptr.write(svg_content)
                 fptr.write("</svg>\n")

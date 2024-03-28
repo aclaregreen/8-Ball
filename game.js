@@ -1,7 +1,5 @@
 $(document).ready(function() {
     attachEventListeners()
-    // var balls = []
-    //var numSolids = ball.length - stripes.length + eightBall.length
     var numSolids = 0
     var numStripes = 0
     var colours = ["YELLOW","BLUE","RED","PURPLE","ORANGE","GREEN","BROWN"]
@@ -9,8 +7,14 @@ $(document).ready(function() {
     var oldSolidCount = numSolids
     var oldStripesCount = numStripes
     var pTurn = 1
+    var namesArr = []
+    var name = $("#playerTurn").text()
+    namesArr.push(name)
+    name = $("#hidden").text()
+    namesArr.push(name)
     var solids = 0
     var stripes = 0
+
 
     function attachEventListeners(){
         var ball = $("circle[fill='WHITE']");
@@ -165,8 +169,6 @@ $(document).ready(function() {
     }
     function gameOver(player){
         var winner
-        console.log(pTurn)
-        console.log(player)
         if (player == solids && numSolids == 0){
             winner = pTurn
         } else if (player == stripes && numStripes == 0){
@@ -174,6 +176,23 @@ $(document).ready(function() {
         } else {
             winner = (pTurn % 2) + 1
         }
-        console.log(winner, " wins")
+        champ = namesArr[winner - 1]
+        $('#winner').text(champ + " wins!!")
+        // Store the text content of #winner
+        var winnerText = $('#winner').text();
+
+// Store the back button element
+        var backButton = $('#backButton').detach(); // Assuming your back button has an ID of "backButton"
+
+        // Clear the entire body except for #winner and the back button
+        $('body').children().not('#winner, #backButton').remove();
+
+        // Set the text content of #winner back
+        $('#winner').text(winnerText);
+
+        // Append the back button back to the body
+        $('body').append(backButton);
+
+        return
     }
 })
