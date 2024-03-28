@@ -161,7 +161,6 @@ class MyHandler( BaseHTTPRequestHandler ):
             id = int (form_data.get('id'))
 
             game = Physics.Game(id)
-            print("THE TABLE ID IS: ", game.tableID)
             table = game.database.readTable(game.tableID)
             files = game.shoot(game.gameName, game.player1Name, table, velx, vely)
             for i in range(len(files)):

@@ -335,6 +335,17 @@ class Table( phylib.phylib_table ):
                     if speed > VEL_EPSILON:
                         object.obj.rolling_ball.acc.x = velx / speed * DRAG * (-1)
                         object.obj.rolling_ball.acc.y = vely / speed * DRAG * (-1)
+    def cueBallSearch(self):
+        found = False
+        for object in self:
+            if object is not None and object.type == phylib.PHYLIB_STILL_BALL:
+                if object.obj.still_ball.number == 0:
+                    found = True
+        if not found:
+            pos = Coordinate( TABLE_WIDTH/2.0,
+                                TABLE_LENGTH - TABLE_WIDTH/2.0 )
+            sb  = StillBall( 0, pos )
+            self += sb
 
 
 class Database:
@@ -754,8 +765,9 @@ class Game:
                     files.append(new_table)
                     #table_id = self.database.writeTable(new_table)
                     #self.database.addToTableShot(table_id, shot_id)
+        old.cueBallSearch()
+            
         files.append(old)
         newTableId = self.database.writeTable(old)
-        print("the new tables id is ", newTableId)
         self.database.updateGame(self.gameID + 1, newTableId)
         return files
