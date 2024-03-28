@@ -5,7 +5,7 @@ PYTHON=/usr/include/python3.11/
 all: _phylib.so
 
 clean:
-	rm -f *.o *.so phylib _phylib.so phylib_wrap.c
+	rm -f *.o *.so phylib _phylib.so phylib_wrap.c *.svg
 
 phylib.o: phylib.c phylib.h
 	$(CC) $(CFLAGS) -c phylib.c -fPIC -o phylib.o

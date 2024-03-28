@@ -1,6 +1,11 @@
 $(document).ready(function() {
+    attachEventListeners()
+})
+
+function attachEventListeners(){
     var ball = $("circle[fill='WHITE']");
-    var svg = $("svg")
+    var svg = $("svg");
+    var id = $("#variable_id").text();
     var x;
     var y;
   
@@ -49,9 +54,9 @@ $(document).ready(function() {
         });
         $(document).mouseup(function(event) {
             // Remove the mousemove event listener
-            var velx = (x - ballX) * 20;
-            var vely = (y - ballY) * 20;
-            shoot(velx, vely);
+            var velx = (ballX - x) * 20;
+            var vely = (ballY - y) * 20;
+            shoot(velx, vely, id);
 
             line.remove();
             $(document).off("mousemove");
@@ -59,20 +64,21 @@ $(document).ready(function() {
             //svg.empty();
         });
     });
-});
+}
 
-function shoot(velx, vely){
-    console.log(velx, vely);
-    $.post("shot", {velx:velx, vely:vely}, display);
+function shoot(velx, vely, id){
+    $.post("shot", {velx:velx, vely:vely, id:id}, display);
 }
 
 function display(data, status){
-    if (status === "success") {
-        // Update the HTML content of a specific element with the received data
-        
-        $("#content").html(data);
-    } else {
-        // Handle error case if necessary
-        console.error("Error: Failed to update HTML content");
-    }
+    var newTable = data.split(":,:")
+    newTable.forEach(function(item, index) {
+        setTimeout(function(){
+            displayShot(item)
+        }, 10 * (index + 1))
+    })
+}
+function displayShot(frame){
+    $('#content').html(frame)
+    attachEventListeners()
 }

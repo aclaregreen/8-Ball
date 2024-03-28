@@ -333,8 +333,8 @@ class Table( phylib.phylib_table ):
                     object.obj.rolling_ball.vel.y = vely
                     speed = math.sqrt((velx * velx) + (vely * vely))
                     if speed > VEL_EPSILON:
-                        object.obj.rolling_ball.acc.x = velx / speed * DRAG
-                        object.obj.rolling_ball.acc.y = vely / speed * DRAG
+                        object.obj.rolling_ball.acc.x = velx / speed * DRAG * (-1)
+                        object.obj.rolling_ball.acc.y = vely / speed * DRAG * (-1)
 
 
 class Database:
@@ -377,7 +377,9 @@ class Database:
 
         game = """CREATE TABLE IF NOT EXISTS
         Game(GAMEID INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-        GAMENAME VARCHAR(64) NOT NULL)"""
+        TABLEID INTEGER NOT NULL,
+        GAMENAME VARCHAR(64) NOT NULL,
+        FOREIGN KEY(TABLEID) REFERENCES TTable(TABLEID))"""
         self.cursor.execute(game)
 
         player = """CREATE TABLE IF NOT EXISTS
@@ -459,26 +461,46 @@ class Database:
         self.conn.commit()
         self.conn.close()
 
-    def getGame(self):
+    def getGame(self, id):
         self.cursor = self.conn.cursor()
-        query = """SELECT Player.PLAYERNAME, Game.GAMENAME FROM Player JOIN Game ON WHERE Game.GAMEID = Player.GAMEID ORDER BY Player.PLAYERID"""
-        self.cursor.execute(query)
+        #query = f"""SELECT PLAYERNAME, GAMENAME FROM (Player
+        #INNER JOIN Game ON Game.GAMEID = Player.GAMEID)
+        #WHERE GAMEID = {id} ORDER BY PLAYERID,"""
+
+
+        query = f"""SELECT PLAYERNAME, GAMENAME 
+                FROM Player 
+                INNER JOIN Game ON Game.GAMEID = Player.GAMEID
+                WHERE Player.GAMEID = ?
+                ORDER BY PLAYERID"""
+        self.cursor.execute(query, (id,))
+
+
+        #self.cursor.execute(query)
         game = self.cursor.fetchall()
+        query = f"""SELECT TABLEID FROM Game WHERE GAMEID = {id}"""
+        self.cursor.execute(query)
+        tableId = int(self.cursor.fetchone()[0])
         self.cursor.close()
         self.conn.commit()
-        return game
-    def setGame(self, game, player1, player2):
+        return (game, tableId)
+    def setGame(self, game, player1, player2, tableID):
         #figure out the game id still
         self.cursor = self.conn.cursor()
-        query = """INSERT INTO Game (GAMENAME) VALUES (?)"""
-        self.cursor.execute(query, (game,))
+        query = """INSERT INTO Game (GAMENAME, TABLEID) VALUES (?, ?)"""
+        self.cursor.execute(query, (game, tableID))
         id = self.cursor.lastrowid
         query = """INSERT INTO Player (GAMEID, PLAYERNAME) VALUES (?, ?)"""
         self.cursor.execute(query, (id, player1))
         self.cursor.execute(query, (id, player2))
         self.cursor.close()
         self.conn.commit()
-        return id
+        return id - 1
+    def updateGame(self, gameId, tableId):
+        self.cursor = self.conn.cursor()
+        query = """UPDATE Game SET TABLEID = ? WHERE GAMEID = ?"""
+        self.cursor.execute(query, (tableId, gameId))
+        self.conn.commit()
 
     def newShot(self, playerName, game_id):
         self.cursor = self.conn.cursor()
@@ -486,7 +508,6 @@ class Database:
         self.cursor.execute(query, (playerName,))
         id = self.cursor.fetchall()
         player_id, game_id = id[0]
-        #game_id = id[1]
         query = """INSERT INTO Shot (PLAYERID, GAMEID) VALUES (?,?)"""
         self.cursor.execute(query, (player_id, game_id))
         self.cursor.close()
@@ -500,26 +521,226 @@ class Database:
         self.cursor.close()
         self.conn.commit()
 
+    def createTable(self):
+        table = Table()
+
+        pos = Coordinate( 
+                TABLE_WIDTH / 2.0,
+                TABLE_WIDTH / 2.0,
+                );
+
+        sb = StillBall( 1, pos );
+        table += sb;
+
+        # 2 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        sb = StillBall( 2, pos );
+        table += sb;
+
+        # 3 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        sb = StillBall( 3, pos );
+        table += sb;
+
+        #4 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0 -
+                        (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 4, pos );
+        table += sb;
+
+        #5 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 5, pos );
+        table += sb;
+
+        #6 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0 +
+                        (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 6, pos );
+        table += sb;
+
+        #7 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0 -
+                        (BALL_DIAMETER+4.0)/2.0 - (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)  -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 7, pos );
+        table += sb;
+
+        #8 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)  -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 8, pos );
+        table += sb;
+        #9 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)  -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 9, pos );
+        table += sb;
+        #10 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0 +
+                        (BALL_DIAMETER+4.0)/2.0 + (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)  -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 10, pos );
+        table += sb;
+        #11 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0 -
+                        (BALL_DIAMETER+4.0)/2.0 - (BALL_DIAMETER+4.0)/2.0 -
+                        (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 11, pos );
+        table += sb;
+        #12 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 - (BALL_DIAMETER+4.0)/2.0 -
+                        (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 12, pos );
+        table += sb;
+        #13 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 13, pos );
+        table += sb;
+        #14 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0 +
+                        (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 14, pos );
+        table += sb;
+        #15 ball
+        pos = Coordinate(
+                        TABLE_WIDTH/2.0 + (BALL_DIAMETER+4.0)/2.0 +
+                        (BALL_DIAMETER+4.0)/2.0 + (BALL_DIAMETER+4.0)/2.0 +
+                        (BALL_DIAMETER+4.0)/2.0,
+                        TABLE_WIDTH/2.0 - 
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0) -
+                        math.sqrt(3.0)/2.0*(BALL_DIAMETER+4.0)
+                        );
+        
+        sb = StillBall( 15, pos );
+        table += sb;
+        # cue ball also still
+        pos = Coordinate( TABLE_WIDTH/2.0,
+                                TABLE_LENGTH - TABLE_WIDTH/2.0 );
+        sb  = StillBall( 0, pos );
+
+        table += sb;
+        file = []
+        f = open("table.svg", "w")
+        f.write(table.svg())
+        file.append("table.svg")
+        f.close()
+        return table
+
 class Game:
     def __init__(self, gameID=None, gameName=None, player1Name=None, player2Name=None):
         #work here
         self.database = Database()
+        self.database.createDB();
+        self.tableID = 0
         if (gameID is not None and gameName is None and player1Name is None and player2Name is None):
-            gameID += 1
-            game = self.database.getGame()
-            self.player1Name, self.player2Name, self.gameName = game[0]
+            self.gameID = gameID
+            game, self.tableID = self.database.getGame(gameID + 1)
+            self.player1Name, self.gameName = game[0]
+            self.player2Name = game[1][0]
             
         elif (gameID is None and gameName is not None and player1Name is not None and player2Name is not None):
-            self.gameID = self.database.setGame(gameName, player1Name, player2Name)
+            self.gameName = gameName
+            self.player1Name = player1Name
+            self.player2Name = player2Name
+            table = self.database.createTable()
+            self.tableID = self.database.writeTable(table)
+            self.gameID = self.database.setGame(gameName, player1Name, player2Name, self.tableID)
         else:
             raise TypeError("Invlaid arguments")
     def shoot(self, gameName, playerName, table, xvel, yvel):
         #work here
-        shot_id = self.database.newShot(playerName, self.gameID)
+        #shot_id = self.database.newShot(playerName, self.gameID)
 
         self.t = Table()
 
         self.t.cueBall(table, xvel, yvel)
+
+        files  = []
 
         while (table):
             old = table
@@ -530,5 +751,11 @@ class Game:
                 for i in range(result):
                     new_table = old.roll(i * FRAME_INTERVAL)
                     new_table.time = old.time + (i * FRAME_INTERVAL)
-                    table_id = self.database.writeTable(new_table)
-                    self.database.addToTableShot(table_id, shot_id)
+                    files.append(new_table)
+                    #table_id = self.database.writeTable(new_table)
+                    #self.database.addToTableShot(table_id, shot_id)
+        files.append(old)
+        newTableId = self.database.writeTable(old)
+        print("the new tables id is ", newTableId)
+        self.database.updateGame(self.gameID + 1, newTableId)
+        return files
