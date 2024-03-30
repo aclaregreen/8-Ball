@@ -169,9 +169,9 @@ $(document).ready(function() {
     }
     function gameOver(player){
         var winner
-        if (player == solids && numSolids == 0){
+        if (player == solids && oldSolidCount == 0){
             winner = pTurn
-        } else if (player == stripes && numStripes == 0){
+        } else if (player == stripes && oldStripesCount == 0){
             winner = pTurn
         } else {
             winner = (pTurn % 2) + 1

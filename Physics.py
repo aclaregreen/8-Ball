@@ -487,9 +487,6 @@ class Database:
 
     def getGame(self, id):
         self.cursor = self.conn.cursor()
-        #query = f"""SELECT PLAYERNAME, GAMENAME FROM (Player
-        #INNER JOIN Game ON Game.GAMEID = Player.GAMEID)
-        #WHERE GAMEID = {id} ORDER BY PLAYERID,"""
 
 
         query = f"""SELECT PLAYERNAME, GAMENAME 
