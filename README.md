@@ -1,1 +1,1 @@
-This is a web application where players can play pool against each other with real time animation and accurate physics
+This is a web application where players can play pool against each other with real time animation and accurate physics. Players are assigned solids/stripes based on first sunk ball. Game is over when 8 ball is sank, same rules as regular pool game, must sink last to win.
